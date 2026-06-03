@@ -86,6 +86,38 @@ def load_defaults():
     return df.median(numeric_only=True).to_dict()
 
 
+def energy_input(defaults):
+    energy_unit = st.radio(
+        "Energy unit",
+        ["kJ / 100g", "kcal / 100g"],
+        horizontal=True,
+    )
+
+    default_kj = float(defaults.get("energy_100g", 0.0))
+    if energy_unit == "kcal / 100g":
+        default_value = default_kj / 4.184
+        maximum = 1000.0
+        help_text = "Converted to kJ before prediction because the model was trained with energy_100g in kJ."
+    else:
+        default_value = default_kj
+        maximum = 4000.0
+        help_text = "Open Food Facts energy_100g is stored as kJ per 100g."
+
+    entered_value = st.number_input(
+        f"energy_100g ({energy_unit})",
+        min_value=0.0,
+        max_value=maximum,
+        value=min(max(default_value, 0.0), maximum),
+        step=1.0,
+        format="%.3f",
+        help=help_text,
+    )
+
+    if energy_unit == "kcal / 100g":
+        return entered_value * 4.184
+    return entered_value
+
+
 def number_input(feature, defaults):
     minimum, maximum, step = RANGES[feature]
     value = float(defaults.get(feature, minimum))
@@ -180,7 +212,10 @@ def main():
                 cols = st.columns(2)
                 for index, feature in enumerate(group_features):
                     with cols[index % 2]:
-                        values[feature] = number_input(feature, defaults)
+                        if feature == "energy_100g":
+                            values[feature] = energy_input(defaults)
+                        else:
+                            values[feature] = number_input(feature, defaults)
 
         predict = st.button("Predict", type="primary", use_container_width=True)
 
