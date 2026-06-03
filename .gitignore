@@ -1,0 +1,20 @@
+# Raw dataset
+en.openfoodfacts.org.products.tsv
+
+# Python/cache artifacts
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Temporary Office files
+~$*
+
+# Render/cache outputs
+detailed_report_render/
+
+# Local extracted helper text
+sample2_text.txt
+mlproject_extracted.txt
+
+# Archives generated for upload
+ieee_report_overleaf_project.zip
